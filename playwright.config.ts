@@ -38,6 +38,12 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    // 1. Setup project to authenticate once
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    // 2. API tests (no browser needed)
     {
       name: 'api',
       testDir: './tests/api',
@@ -45,10 +51,15 @@ export default defineConfig({
         baseURL: process.env.BASE_API_URL || 'https://reqres.in/api/',
       },
     },
+    // 3. UI tests reusing authenticated session
     {
       name: 'chromium',
       testDir: './tests/ui',
-      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/user.json',
+      },
     },
   ],
 });

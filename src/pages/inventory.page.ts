@@ -6,6 +6,7 @@ export class InventoryPage extends BasePage {
   readonly inventoryItems: Locator;
   readonly shoppingCartBadge: Locator;
   readonly addBackpackButton: Locator;
+  readonly removeBackpackButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -13,6 +14,14 @@ export class InventoryPage extends BasePage {
     this.inventoryItems = page.locator('[data-test="inventory-item"]');
     this.shoppingCartBadge = page.locator('[data-test="shopping-cart-badge"]');
     this.addBackpackButton = page.locator('[data-test="add-to-cart-sauce-labs-backpack"]');
+    this.removeBackpackButton = page.locator('[data-test="remove-sauce-labs-backpack"]');
+  }
+
+  /**
+   * Navigates directly to the inventory page
+   */
+  async goto(): Promise<void> {
+    await this.page.goto('https://www.saucedemo.com/inventory.html');
   }
 
   async getItemCount(): Promise<number> {
@@ -24,6 +33,13 @@ export class InventoryPage extends BasePage {
    */
   async addBackpackToCart(): Promise<void> {
     await this.addBackpackButton.click();
+  }
+
+  /**
+   * Clicks 'Remove' on Sauce Labs Backpack
+   */
+  async removeBackpackFromCart(): Promise<void> {
+    await this.removeBackpackButton.click();
   }
 
   /**

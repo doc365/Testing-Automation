@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../src/pages/login.page';
 import { InventoryPage } from '../../src/pages/inventory.page';
 
+// Clear storageState for login tests so they start unauthenticated
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe('UI Smoke Suite - Authentication', () => {
   let loginPage: LoginPage;
   let inventoryPage: InventoryPage;
