@@ -24,7 +24,8 @@ export default defineConfig({
   reporter: [
     ['html', { open: 'never' }],
     ['list'],
-    ['./src/reporters/jira.reporter.ts']
+    ['./src/reporters/jira.reporter.ts'],
+    ['./src/reporters/n8n.reporter.ts']
   ],
   /* Shared settings for all the projects below. */
   use: {
