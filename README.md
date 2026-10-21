@@ -38,33 +38,41 @@ This repository contains an enterprise-standard full-stack test automation frame
 
 ### 1. Install Dependencies
 ```bash
-npm install
-npx playwright install chromium
+pnpm install
+pnpm exec playwright install chromium
 ```
+
+*(Fallback with npm: `npm install && npx playwright install chromium`)*
 
 ### 2. Run Tests
 
 * **Run all tests (UI + API):**
   ```bash
-  npm test
+  pnpm test
   ```
 
 * **Run only API tests:**
   ```bash
-  npm run test:api
+  pnpm run test:api
   ```
 
 * **Run only UI tests:**
   ```bash
-  npm run test:ui
+  pnpm run test:ui
   ```
 
 * **Run UI tests in headed browser (watch tests execute):**
   ```bash
-  npm run test:headed
+  pnpm run test:headed
   ```
 
 * **View HTML Test Report:**
   ```bash
-  npm run test:report
+  pnpm run test:report
   ```
+
+### 3. Run n8n Locally
+```bash
+pnpm dlx n8n
+# Fallback: npx n8n
+```

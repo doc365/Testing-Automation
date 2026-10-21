@@ -142,5 +142,149 @@
         }
       }
     }
+  },
+  {
+    "key": "AUT-8321",
+    "timestamp": "2026-10-21T04:23:08.320Z",
+    "details": {
+      "fields": {
+        "project": {
+          "key": "AUT"
+        },
+        "summary": "[Automation Failure]: Pricing Calculation Mismatch",
+        "description": {
+          "type": "doc",
+          "version": 1,
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "An automated test failure was detected in CI/CD pipeline.",
+                  "marks": [
+                    {
+                      "type": "strong"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📁 Test File: tests/ui/jira-integration.spec.ts\n"
+                },
+                {
+                  "type": "text",
+                  "text": "🧪 Scenario: Pricing Calculation Mismatch\n"
+                },
+                {
+                  "type": "text",
+                  "text": "⏱ Timestamp: 2026-10-21T04:23:08.299Z\n"
+                }
+              ]
+            },
+            {
+              "type": "codeBlock",
+              "attrs": {
+                "language": "text"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Business Rule Violation: Expected $29.99, but found $39.99"
+                }
+              ]
+            }
+          ]
+        },
+        "issuetype": {
+          "name": "Bug"
+        },
+        "labels": [
+          "automation",
+          "playwright-failure",
+          "regression-bug"
+        ],
+        "priority": {
+          "name": "Highest"
+        }
+      }
+    }
+  },
+  {
+    "key": "AUT-8477",
+    "timestamp": "2026-10-21T04:23:11.966Z",
+    "details": {
+      "fields": {
+        "project": {
+          "key": "AUT"
+        },
+        "summary": "[Automation Failure]: Scenario-based Defect Detection: Condition triggers custom ticket",
+        "description": {
+          "type": "doc",
+          "version": 1,
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "An automated test failure was detected in CI/CD pipeline.",
+                  "marks": [
+                    {
+                      "type": "strong"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📁 Test File: E:\\Documents\\Testing Automation\\tests\\ui\\jira-integration.spec.ts\n"
+                },
+                {
+                  "type": "text",
+                  "text": "🧪 Scenario: Scenario-based Defect Detection: Condition triggers custom ticket\n"
+                },
+                {
+                  "type": "text",
+                  "text": "⏱ Timestamp: 2026-10-21T04:23:11.965Z\n"
+                }
+              ]
+            },
+            {
+              "type": "codeBlock",
+              "attrs": {
+                "language": "text"
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m29.99\u001b[39m\nReceived: \u001b[31m39.99\u001b[39m\n    at E:\\Documents\\Testing Automation\\tests\\ui\\jira-integration.spec.ts:26:25"
+                }
+              ]
+            }
+          ]
+        },
+        "issuetype": {
+          "name": "Bug"
+        },
+        "labels": [
+          "automation",
+          "playwright-failure",
+          "regression-bug"
+        ],
+        "priority": {
+          "name": "High"
+        }
+      }
+    }
   }
 ]
