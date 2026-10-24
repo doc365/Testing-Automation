@@ -1,5 +1,9 @@
 # Project Preferences & Architecture Memory
 
+## 0. User & Regional Settings
+* **Location / Timezone:** Vietnam (UTC+7 / `Asia/Ho_Chi_Minh`).
+* **Formula Syntax Preference:** Semicolon (`;`) delimiter for regional spreadsheet functions (e.g. `=TEXT(COUNTIF(B2:B; "PASSED") / COUNTA(B2:B); "0.0%")`).
+
 ## 1. Environment & Package Manager Preferences
 * **Preferred Package Manager:** `pnpm` (fallback to `npm` / `npx` only when strictly necessary).
 * **Storage Locations (Always E: Drive):**
