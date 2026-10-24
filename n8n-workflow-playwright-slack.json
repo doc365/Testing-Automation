@@ -1,0 +1,122 @@
+{
+  "name": "Playwright QAOps Notification Hub",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-events",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        64
+      ],
+      "id": "918b29e1-776f-4921-a99d-8681614d2f17",
+      "name": "Webhook",
+      "webhookId": "test-events"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6999ac90-7076-4f41-8d40-9280b54cf19d",
+              "leftValue": "={{ ($json.body?.status || $json.status || '').trim() }}",
+              "rightValue": "PASSED",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        176,
+        64
+      ],
+      "id": "a11156c8-2490-4b3c-830f-260226dde859",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  username: 'QA Pipeline Bot',\n  icon_emoji: ':white_check_mark:',\n  text: '✅ *All Tests Passed Cleanly!*\\n• *Passed:* ' + ($json.body?.passed || $json.passed || 0) + '/' + ($json.body?.totalTests || $json.totalTests || 0) + '\\n• *Duration:* ' + ($json.body?.durationSeconds || $json.durationSeconds || 0) + 's'\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "a26d9911-7148-403b-a112-eace4d2f3d64",
+      "name": "Slack - Success Alert"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  username: '🚨 QA Incident Bot',\n  icon_emoji: ':fire:',\n  text: '<!here> 🚨 *CRITICAL: Test Suite Regression Detected!*\\n\\n• *Failed:* ' + ($json.body?.failed || $json.failed || 1) + '\\n• *Passed:* ' + ($json.body?.passed || $json.passed || 0) + '\\n• *Duration:* ' + ($json.body?.durationSeconds || $json.durationSeconds || 0) + 's\\n\\n❌ *Failed Scenarios:*\\n' + (($json.body?.failedScenarios || $json.failedScenarios || []).map(f => '• ' + f.title).join('\\n') || '• Check test logs')\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        400,
+        80
+      ],
+      "id": "d79b985d-98d6-4fc5-9238-b08134513d69",
+      "name": "Slack - Urgent Failure Alert"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Slack - Success Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack - Urgent Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
