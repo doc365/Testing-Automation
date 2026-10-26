@@ -1,0 +1,36 @@
+[
+  {
+    "description": "Valid Standard User",
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "shouldSucceed": true
+  },
+  {
+    "description": "Locked Out User",
+    "username": "locked_out_user",
+    "password": "secret_sauce",
+    "shouldSucceed": false,
+    "expectedError": "Sorry, this user has been locked out."
+  },
+  {
+    "description": "Invalid Password",
+    "username": "standard_user",
+    "password": "wrong_password",
+    "shouldSucceed": false,
+    "expectedError": "Username and password do not match any user in this service"
+  },
+  {
+    "description": "Missing Username",
+    "username": "",
+    "password": "secret_sauce",
+    "shouldSucceed": false,
+    "expectedError": "Username is required"
+  },
+  {
+    "description": "Missing Password",
+    "username": "standard_user",
+    "password": "",
+    "shouldSucceed": false,
+    "expectedError": "Password is required"
+  }
+]

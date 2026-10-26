@@ -8,6 +8,23 @@ export interface TestEventPayload {
   timestamp: string;
 }
 
+export interface SuiteSummaryPayload {
+  event: 'SUITE_SUMMARY';
+  status: 'PASSED' | 'FAILED' | 'TIMEDOUT' | 'INTERRUPTED';
+  totalTests: number;
+  passed: number;
+  failed: number;
+  skipped: number;
+  durationSeconds: number;
+  reportUrl?: string;
+  timestamp: string;
+  failedScenarios: Array<{
+    title: string;
+    file: string;
+    error: string;
+  }>;
+}
+
 export class N8nClient {
   private webhookUrl: string;
 
@@ -16,16 +33,27 @@ export class N8nClient {
   }
 
   /**
-   * Dispatches a test event payload to your local or cloud n8n webhook
+   * Dispatches a single test failure event
    */
   async sendTestEvent(payload: TestEventPayload): Promise<boolean> {
+    return this.postPayload(payload);
+  }
+
+  /**
+   * Dispatches the full test suite summary (whether it passed or failed)
+   */
+  async sendSuiteSummary(payload: SuiteSummaryPayload): Promise<boolean> {
+    return this.postPayload(payload);
+  }
+
+  private async postPayload(payload: any): Promise<boolean> {
     if (!process.env.N8N_WEBHOOK_URL) {
       return false;
     }
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s safety timeout
+      const timeoutId = setTimeout(() => controller.abort(), 4000); // 4s timeout
 
       const response = await fetch(this.webhookUrl, {
         method: 'POST',
@@ -37,15 +65,14 @@ export class N8nClient {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        console.log(`📡 [n8n] Successfully dispatched "${payload.scenarioName}" to n8n webhook`);
+        console.log(`📡 [n8n] Test suite summary dispatched successfully to n8n!`);
         return true;
       } else {
         console.warn(`⚠️ [n8n] Webhook responded with status: ${response.status}`);
         return false;
       }
     } catch (err: any) {
-      // Gracefully handle if n8n is not running so tests never crash
-      console.log(`ℹ️ [n8n] Webhook server unreachable at ${this.webhookUrl} (n8n might not be started)`);
+      console.log(`ℹ️ [n8n] Webhook server unreachable at ${this.webhookUrl} (n8n might not be running)`);
       return false;
     }
   }

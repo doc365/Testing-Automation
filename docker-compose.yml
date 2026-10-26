@@ -1,0 +1,40 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n-automation
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
+      - N8N_DIAGNOSTICS_ENABLED=false
+      # Execution pruning: keep database lightweight by deleting logs older than 7 days
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168 # 7 days in hours
+      - EXECUTIONS_DATA_PRUNE_MAX_COUNT=500 # max 500 executions stored
+    volumes:
+      - ./n8n-data:/home/node/.n8n
+    # Resource caps: prevent n8n from hogging system memory
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+    # Automatic container health check
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5678/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # Log rotation: caps container log files to 10MB
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

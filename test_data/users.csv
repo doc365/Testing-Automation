@@ -1,0 +1,8 @@
+description,username,password,shouldSucceed,expectedError
+Standard User Login,standard_user,secret_sauce,true,
+Locked Out User,locked_out_user,secret_sauce,false,"Sorry, this user has been locked out."
+Invalid Password,standard_user,wrong_pass_123,false,Username and password do not match
+Empty Username,,secret_sauce,false,Username is required
+Empty Password,standard_user,,false,Password is required
+Problem User Login,problem_user,secret_sauce,true,
+Performance Glitch User,performance_glitch_user,secret_sauce,true,

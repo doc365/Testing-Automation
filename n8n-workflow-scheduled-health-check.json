@@ -1,0 +1,152 @@
+{
+  "name": "Autonomous API Smoke Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -120,
+        60
+      ],
+      "id": "e43b1234-5678-4abc-9def-112233445566",
+      "name": "Every 1 Hour"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://reqres.in/api/users?page=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        120,
+        60
+      ],
+      "id": "f56c2345-6789-4bcd-8ef0-223344556677",
+      "name": "Ping Core API"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "789d3456-789a-4cde-9f01-334455667788",
+              "leftValue": "={{ ($json.data && Array.isArray($json.data) && $json.data.length > 0) ? 'HEALTHY' : 'UNHEALTHY' }}",
+              "rightValue": "HEALTHY",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        360,
+        60
+      ],
+      "id": "a67e4567-89ab-4def-0123-445566778899",
+      "name": "Is API Healthy?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  username: 'QA Health Monitor',\n  text: '[HEALTH CHECK: HEALTHY] Core API is operational.\\n' +\n    '• Endpoint: GET https://reqres.in/api/users?page=1\\n' +\n    '• Status: 200 OK (' + ($json.data ? $json.data.length : 0) + ' records verified)\\n' +\n    '• Timestamp: ' + (new Date().toISOString())\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        620,
+        -60
+      ],
+      "id": "b78f5678-9abc-4ef0-1234-5566778899aa",
+      "name": "Slack - Healthy Status (No Emojis)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  username: 'QA Incident Alert',\n  text: '<!here> [HEALTH CHECK: OUTAGE DETECTED] Core API probe failed.\\n' +\n    '• Endpoint: GET https://reqres.in/api/users?page=1\\n' +\n    '• Details: Invalid response format or server offline\\n' +\n    '• Timestamp: ' + (new Date().toISOString())\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        620,
+        180
+      ],
+      "id": "c89a6789-abcd-4f01-2345-66778899aabb",
+      "name": "Slack - Outage Alert (No Emojis)"
+    }
+  ],
+  "connections": {
+    "Every 1 Hour": {
+      "main": [
+        [
+          {
+            "node": "Ping Core API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ping Core API": {
+      "main": [
+        [
+          {
+            "node": "Is API Healthy?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is API Healthy?": {
+      "main": [
+        [
+          {
+            "node": "Slack - Healthy Status (No Emojis)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack - Outage Alert (No Emojis)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
