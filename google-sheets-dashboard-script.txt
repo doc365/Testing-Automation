@@ -1,12 +1,12 @@
 // ========================================================
-// 1. REFRESH & RESTORE DASHBOARD (PERFECT ALIGNMENT)
+// 1. REFRESH & OPTIMIZE DASHBOARD (NO EMOJIS, HIGH PERFORMANCE)
 // ========================================================
 function resetAndFormatDashboard() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("QA Metrics") || ss.getActiveSheet();
   sheet.setName("QA Metrics");
 
-  // 1. Remove old charts
+  // 1. Remove old charts to eliminate clutter
   var charts = sheet.getCharts();
   for (var i = 0; i < charts.length; i++) {
     sheet.removeChart(charts[i]);
@@ -28,7 +28,7 @@ function resetAndFormatDashboard() {
   sheet.setColumnWidth(9, 130); // KPI 1
   sheet.setColumnWidth(10, 130);// KPI 2
 
-  // 4. Set Clean Row 1 Headers
+  // 4. Set Clean Row 1 Headers (NO EMOJIS)
   var headers = [["Date & Time (UTC+7)", "Status", "Total Tests", "Passed", "Failed", "Duration", "Failed Scenarios / Errors"]];
   sheet.getRange("A1:G1").setValues(headers)
     .setFontFamily("Roboto, Arial, sans-serif")
@@ -42,9 +42,9 @@ function resetAndFormatDashboard() {
   sheet.setRowHeight(1, 40);
   sheet.setFrozenRows(1);
 
-  // 5. Build Side Widget (Columns I & J)
+  // 5. Build Side Widget (Columns I & J - NO EMOJIS)
   sheet.getRange("I1:J1").merge()
-    .setValue("⚡ SUITE HEALTH SUMMARY")
+    .setValue("SUITE HEALTH SUMMARY")
     .setFontFamily("Roboto, Arial, sans-serif")
     .setFontSize(9)
     .setFontWeight("bold")
@@ -66,7 +66,7 @@ function resetAndFormatDashboard() {
 
   sheet.getRange("I1:J5").setBorder(true, true, true, true, true, true, "#E2E8F0", SpreadsheetApp.BorderStyle.SOLID);
 
-  // 6. Shift any displaced data rows up so they start right at Row 2!
+  // 6. Compact existing data rows cleanly under Row 1
   var lastRow = sheet.getLastRow();
   var rawData = [];
   for (var r = 2; r <= lastRow; r++) {
@@ -76,12 +76,10 @@ function resetAndFormatDashboard() {
     }
   }
 
-  // Clear column A:G rows below header
   if (lastRow >= 2) {
     sheet.getRange(2, 1, lastRow - 1, 7).clear({ contentsOnly: true, formatOnly: true });
   }
 
-  // Write existing data back starting strictly from Row 2!
   if (rawData.length > 0) {
     sheet.getRange(2, 1, rawData.length, 7).setValues(rawData);
     for (var k = 0; k < rawData.length; k++) {
@@ -129,7 +127,7 @@ function resetAndFormatDashboard() {
 }
 
 // ========================================================
-// 2. LIVE WEBHOOK (STRICTLY APPENDS TO NEXT EMPTY ROW)
+// 2. LIVE WEBHOOK (FAST APPEND WITH ZERO EMOJIS)
 // ========================================================
 function doPost(e) {
   try {

@@ -1,34 +1,34 @@
 // ========================================================
-// 1. CLEAN RESET & RESTORE DASHBOARD
+// 1. REFRESH & OPTIMIZE DASHBOARD (NO EMOJIS, HIGH PERFORMANCE)
 // ========================================================
 function resetAndFormatDashboard() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("QA Metrics") || ss.getActiveSheet();
   sheet.setName("QA Metrics");
 
-  // 1. Remove all old charts to eliminate clutter
+  // 1. Remove old charts to eliminate clutter
   var charts = sheet.getCharts();
   for (var i = 0; i < charts.length; i++) {
     sheet.removeChart(charts[i]);
   }
 
-  // 2. Unmerge any stray merged cells on the right
-  sheet.getRange("H1:N20").breakApart();
-  sheet.getRange("H1:N20").clear({ contentsOnly: true, formatOnly: true });
+  // 2. Unmerge any stray cells in Columns H:N
+  sheet.getRange("H1:N25").breakApart();
+  sheet.getRange("H1:N25").clear({ contentsOnly: true, formatOnly: true });
 
   // 3. Set standard column widths
-  sheet.setColumnWidth(1, 175); // Date & Time
-  sheet.setColumnWidth(2, 110); // Status
+  sheet.setColumnWidth(1, 165); // Date & Time
+  sheet.setColumnWidth(2, 105); // Status
   sheet.setColumnWidth(3, 85);  // Total Tests
   sheet.setColumnWidth(4, 85);  // Passed
   sheet.setColumnWidth(5, 85);  // Failed
-  sheet.setColumnWidth(6, 100); // Duration
-  sheet.setColumnWidth(7, 360); // Scenarios
-  sheet.setColumnWidth(8, 30);  // Spacer
-  sheet.setColumnWidth(9, 130); // KPI Column 1
-  sheet.setColumnWidth(10, 130);// KPI Column 2
+  sheet.setColumnWidth(6, 95);  // Duration
+  sheet.setColumnWidth(7, 350); // Scenarios
+  sheet.setColumnWidth(8, 25);  // Spacer
+  sheet.setColumnWidth(9, 130); // KPI 1
+  sheet.setColumnWidth(10, 130);// KPI 2
 
-  // 4. Set Clean Row 1 Headers
+  // 4. Set Clean Row 1 Headers (NO EMOJIS)
   var headers = [["Date & Time (UTC+7)", "Status", "Total Tests", "Passed", "Failed", "Duration", "Failed Scenarios / Errors"]];
   sheet.getRange("A1:G1").setValues(headers)
     .setFontFamily("Roboto, Arial, sans-serif")
@@ -42,10 +42,9 @@ function resetAndFormatDashboard() {
   sheet.setRowHeight(1, 40);
   sheet.setFrozenRows(1);
 
-  // 5. Build Clean Side Widget (Columns I & J)
-  // Header
+  // 5. Build Side Widget (Columns I & J - NO EMOJIS)
   sheet.getRange("I1:J1").merge()
-    .setValue("⚡ SUITE HEALTH SUMMARY")
+    .setValue("SUITE HEALTH SUMMARY")
     .setFontFamily("Roboto, Arial, sans-serif")
     .setFontSize(9)
     .setFontWeight("bold")
@@ -54,54 +53,65 @@ function resetAndFormatDashboard() {
     .setHorizontalAlignment("center")
     .setVerticalAlignment("middle");
 
-  // Labels
   sheet.getRange("I2").setValue("PASS RATE").setFontSize(8).setFontWeight("bold").setFontColor("#64748B").setHorizontalAlignment("center").setBackground("#F8FAFC");
   sheet.getRange("J2").setValue("TOTAL RUNS").setFontSize(8).setFontWeight("bold").setFontColor("#64748B").setHorizontalAlignment("center").setBackground("#F8FAFC");
   sheet.getRange("I4").setValue("PASSED").setFontSize(8).setFontWeight("bold").setFontColor("#15803D").setHorizontalAlignment("center").setBackground("#F8FAFC");
   sheet.getRange("J4").setValue("FAILED").setFontSize(8).setFontWeight("bold").setFontColor("#DC2626").setHorizontalAlignment("center").setBackground("#F8FAFC");
 
-  // Safe Formulas (Using native Google Sheets syntax with no delimiter conflicts)
-  sheet.getRange("I5").setFormula('=COUNTIF(B2:B, "PASSED")').setFontSize(14).setFontWeight("bold").setFontColor("#16A34A").setHorizontalAlignment("center").setBackground("#F0FDF4");
-  sheet.getRange("J5").setFormula('=COUNTIF(B2:B, "FAILED")').setFontSize(14).setFontWeight("bold").setFontColor("#DC2626").setHorizontalAlignment("center").setBackground("#FEF2F2");
+  // Safe Formulas for Vietnam Locale (;)
+  sheet.getRange("I5").setFormula('=COUNTIF(B2:B; "PASSED")').setFontSize(14).setFontWeight("bold").setFontColor("#16A34A").setHorizontalAlignment("center").setBackground("#F0FDF4");
+  sheet.getRange("J5").setFormula('=COUNTIF(B2:B; "FAILED")').setFontSize(14).setFontWeight("bold").setFontColor("#DC2626").setHorizontalAlignment("center").setBackground("#FEF2F2");
   sheet.getRange("J3").setFormula('=I5 + J5').setFontSize(20).setFontWeight("bold").setFontColor("#0F172A").setHorizontalAlignment("center").setBackground("#F8FAFC");
-  sheet.getRange("I3").setFormula('=IF(J3=0, "0.0%", TEXT(I5/J3, "0.0%"))').setFontSize(20).setFontWeight("bold").setFontColor("#15803D").setHorizontalAlignment("center").setBackground("#F0FDF4");
+  sheet.getRange("I3").setFormula('=IF(J3=0; "0,0%"; TEXT(I5/J3; "0,0%"))').setFontSize(20).setFontWeight("bold").setFontColor("#15803D").setHorizontalAlignment("center").setBackground("#F0FDF4");
 
   sheet.getRange("I1:J5").setBorder(true, true, true, true, true, true, "#E2E8F0", SpreadsheetApp.BorderStyle.SOLID);
 
-  // 6. Style any existing data rows under Row 1
+  // 6. Compact existing data rows cleanly under Row 1
   var lastRow = sheet.getLastRow();
-  if (lastRow >= 2 && sheet.getRange(2, 1).getValue().toString().trim() !== "") {
-    for (var r = 2; r <= lastRow; r++) {
-      var rowRange = sheet.getRange(r, 1, 1, 7);
+  var rawData = [];
+  for (var r = 2; r <= lastRow; r++) {
+    var val = sheet.getRange(r, 1).getValue().toString().trim();
+    if (val !== "") {
+      rawData.push(sheet.getRange(r, 1, 1, 7).getValues()[0]);
+    }
+  }
+
+  if (lastRow >= 2) {
+    sheet.getRange(2, 1, lastRow - 1, 7).clear({ contentsOnly: true, formatOnly: true });
+  }
+
+  if (rawData.length > 0) {
+    sheet.getRange(2, 1, rawData.length, 7).setValues(rawData);
+    for (var k = 0; k < rawData.length; k++) {
+      var curRow = k + 2;
+      var rowRange = sheet.getRange(curRow, 1, 1, 7);
       rowRange.setFontFamily("Roboto, Arial, sans-serif").setFontSize(9).setVerticalAlignment("middle");
-      sheet.setRowHeight(r, 32);
+      sheet.setRowHeight(curRow, 32);
 
-      var isEven = (r % 2 === 0);
-      rowRange.setBackground(isEven ? "#FFFFFF" : "#F8FAFC");
-      sheet.getRange(r, 1, 1, 6).setHorizontalAlignment("center");
-      sheet.getRange(r, 7).setHorizontalAlignment("left");
+      rowRange.setBackground(curRow % 2 === 0 ? "#FFFFFF" : "#F8FAFC");
+      sheet.getRange(curRow, 1, 1, 6).setHorizontalAlignment("center");
+      sheet.getRange(curRow, 7).setHorizontalAlignment("left");
 
-      var status = sheet.getRange(r, 2).getValue().toString().trim().toUpperCase();
-      var badge = sheet.getRange(r, 2).setFontWeight("bold");
-      if (status === "PASSED") {
+      var st = rawData[k][1].toString().trim().toUpperCase();
+      var badge = sheet.getRange(curRow, 2).setFontWeight("bold");
+      if (st === "PASSED") {
         badge.setBackground("#DCFCE7").setFontColor("#15803D");
-      } else if (status === "FAILED") {
+      } else if (st === "FAILED") {
         badge.setBackground("#FEE2E2").setFontColor("#B91C1C");
       }
       rowRange.setBorder(true, true, true, true, false, false, "#F1F5F9", SpreadsheetApp.BorderStyle.SOLID);
     }
   }
 
-  // 7. Mini Chart Helper in K1:L3
+  // 7. Donut Chart Helper (K1:L3)
   sheet.getRange("K1").setValue("Status");
   sheet.getRange("L1").setValue("Count");
   sheet.getRange("K2").setValue("PASSED");
-  sheet.getRange("L2").setFormula('=I5');
+  sheet.getRange("K2").setFormula('=I5');
   sheet.getRange("K3").setValue("FAILED");
   sheet.getRange("L3").setFormula('=J5');
   sheet.getRange("K1:L3").setFontColor("#E2E8F0").setFontSize(6);
 
-  // Clean Donut Chart positioned under KPI widget
   var chart = sheet.newChart()
     .setChartType(Charts.ChartType.PIE)
     .addRange(sheet.getRange("K1:L3"))
@@ -117,7 +127,7 @@ function resetAndFormatDashboard() {
 }
 
 // ========================================================
-// 2. LIVE WEBHOOK (APPENDS INCOMING TEST RUNS)
+// 2. LIVE WEBHOOK (FAST APPEND WITH ZERO EMOJIS)
 // ========================================================
 function doPost(e) {
   try {
@@ -129,12 +139,16 @@ function doPost(e) {
     var timestamp = Utilities.formatDate(new Date(), "Asia/Ho_Chi_Minh", "yyyy-MM-dd HH:mm:ss");
     var status = (body.status || "UNKNOWN").toUpperCase();
     var duration = (body.durationSeconds || 0) + "s";
-    var failedList = (body.failedScenarios || [])
-      .map(function (f) { return f.title; })
-      .join(", ");
+    var failedList = (body.failedScenarios || []).map(function (f) { return f.title; }).join(", ");
 
-    // Finds the next empty row in Column A
-    var nextRow = sheet.getRange("A:A").getValues().filter(String).length + 1;
+    // Finds next clean row in Column A
+    var colA = sheet.getRange("A:A").getValues();
+    var nextRow = 2;
+    for (var i = 1; i < colA.length; i++) {
+      if (colA[i][0].toString().trim() !== "") {
+        nextRow = i + 2;
+      }
+    }
 
     sheet.getRange(nextRow, 1, 1, 7).setValues([[
       timestamp,
