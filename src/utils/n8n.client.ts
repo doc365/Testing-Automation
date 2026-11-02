@@ -65,14 +65,14 @@ export class N8nClient {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        console.log(`📡 [n8n] Test suite summary dispatched successfully to n8n!`);
+        console.log(`[n8n] Test suite summary dispatched successfully to n8n!`);
         return true;
       } else {
-        console.warn(`⚠️ [n8n] Webhook responded with status: ${response.status}`);
+        console.warn(`[n8n] [WARNING] Webhook responded with status: ${response.status}`);
         return false;
       }
     } catch (err: any) {
-      console.log(`ℹ️ [n8n] Webhook server unreachable at ${this.webhookUrl} (n8n might not be running)`);
+      console.log(`[n8n] [INFO] Webhook server unreachable at ${this.webhookUrl} (n8n might not be running)`);
       return false;
     }
   }

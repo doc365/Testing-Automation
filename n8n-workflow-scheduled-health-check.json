@@ -1,13 +1,13 @@
 {
-  "name": "Autonomous API Smoke Monitor",
+  "name": "Daily 9AM Smoke Monitor",
   "nodes": [
     {
       "parameters": {
         "rule": {
           "interval": [
             {
-              "field": "hours",
-              "hoursInterval": 1
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
             }
           ]
         }
@@ -19,7 +19,7 @@
         60
       ],
       "id": "e43b1234-5678-4abc-9def-112233445566",
-      "name": "Every 1 Hour"
+      "name": "Daily 9:00 AM"
     },
     {
       "parameters": {

@@ -23,7 +23,7 @@ export default class JiraBugReporter implements Reporter {
       return;
     }
 
-    console.log(`\n📋 [Jira Reporter] Processing ${this.failedTestsToReport.length} failed scenario(s) for Jira ticket creation...`);
+    console.log(`\n[Jira Reporter] Processing ${this.failedTestsToReport.length} failed scenario(s) for Jira ticket creation...`);
 
     for (const item of this.failedTestsToReport) {
       const scenarioTitle = item.test.title;

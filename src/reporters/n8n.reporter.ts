@@ -52,7 +52,7 @@ export default class N8nReporter implements Reporter {
       failedScenarios: this.failedScenarios,
     };
 
-    console.log(`\n📊 [n8n Reporter] Test run completed with status: ${overallStatus} (${this.passed} passed, ${this.failed} failed)`);
+    console.log(`\n[n8n Reporter] Test run completed with status: ${overallStatus} (${this.passed} passed, ${this.failed} failed)`);
     await this.n8nClient.sendSuiteSummary(summaryPayload);
   }
 }

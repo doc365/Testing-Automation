@@ -3,5 +3,17 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/playwright/.auth/
 .env
 .env.local
+
+# Local execution runtime, logs, and database volumes
+n8n-data/
+logs/
+
+# Agent, preferences, plans, and knowledge graph artifacts
+.agents/
+AGENTS.md
+PROJECT_PREFERENCES.md
+TEST_EXPANSION_PLAN.md
+graphify-out/

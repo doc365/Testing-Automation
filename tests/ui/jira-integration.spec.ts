@@ -6,8 +6,8 @@ test.describe('Jira Integration Showcase', () => {
 
   test('Scenario-based Defect Detection: Condition triggers custom ticket', async () => {
     // Simulate checking a critical business rule (e.g., product price mismatch)
-    const expectedPrice = 29.99;
-    const actualPrice = 39.99; // Simulating a bug found in calculation
+    const expectedPrice: number = 29.99;
+    const actualPrice: number = 39.99; // Simulating a bug found in calculation
 
     if (actualPrice !== expectedPrice) {
       // Create Jira ticket immediately based on the specific business scenario

@@ -1,106 +1,311 @@
-# Full-Stack Automation Framework (Playwright + TypeScript)
+# Full-Stack Test Automation Framework
 
-This repository contains an enterprise-standard full-stack test automation framework covering both **API testing** and **Web UI End-to-End (E2E) testing**.
+Enterprise-grade test automation framework built with **Playwright** and **TypeScript**, targeting the [SauceDemo](https://www.saucedemo.com/) e-commerce application with full QAOps pipeline integration.
 
-## 🏗 Architecture & Design Patterns
+---
 
-* **Language:** TypeScript
-* **Test Runner:** Playwright Test Runner
-* **UI Design Pattern:** Page Object Model (POM)
-* **API Pattern:** Service Object Pattern (`src/api/*`)
-* **Assertions:** Playwright web-first assertions
-* **Reporting:** Built-in Playwright HTML Reporter with trace & video on failure
+## Table of Contents
 
-## 📂 Project Structure
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Running Tests](#running-tests)
+- [Test Coverage Matrix](#test-coverage-matrix)
+- [QAOps Pipeline](#qaops-pipeline)
+- [Daily Automated Smoke Test](#daily-automated-smoke-test)
+- [Test Expansion Roadmap](#test-expansion-roadmap)
+- [Troubleshooting](#troubleshooting)
+
+---
+
+## Architecture
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Language | TypeScript | Type-safe test authoring |
+| Test Runner | Playwright Test | Execution, parallelism, assertions |
+| UI Design Pattern | Page Object Model (POM) | Decouple locators from test logic |
+| API Design Pattern | Service Object Pattern | Reusable API client wrappers |
+| Assertions | Playwright web-first assertions | Auto-waiting, retry-enabled |
+| Reporting | HTML + Jira + n8n custom reporters | Multi-channel test result delivery |
+| Orchestration | n8n (Docker) | Workflow automation, webhook routing |
+| CI/CD | GitHub Actions | Pull request validation, scheduled runs |
+| Notifications | Slack (via n8n) | Real-time pass/fail alerts |
+| Metrics | Google Sheets (via Apps Script) | Live dashboard with pass rate tracking |
+
+---
+
+## Project Structure
 
 ```text
-├── .github/workflows/          # CI/CD GitHub Actions workflow
+testing-automation/
+├── .github/workflows/
+│   └── test.yml                     # CI/CD pipeline (push + PR triggers)
 ├── src/
-│   ├── api/                    # API client services & payload interfaces
-│   │   └── user.api.ts
-│   └── pages/                  # Page Object classes (UI locators & methods)
-│       ├── base.page.ts
-│       ├── login.page.ts
-│       └── inventory.page.ts
+│   ├── api/
+│   │   └── user.api.ts              # REST API client (ReqRes.in)
+│   ├── pages/                       # Page Object Model classes
+│   │   ├── base.page.ts             # Abstract base (shared navigation)
+│   │   ├── login.page.ts            # Login form interactions
+│   │   ├── inventory.page.ts        # Product catalog interactions
+│   │   ├── product-detail.page.ts   # Individual product view [Wave 1]
+│   │   ├── cart.page.ts             # Shopping cart management [Wave 1]
+│   │   ├── checkout-info.page.ts    # Checkout form (name, postal) [Wave 1]
+│   │   ├── checkout-overview.page.ts # Order review + pricing [Wave 1]
+│   │   └── checkout-complete.page.ts # Order confirmation [Wave 1]
+│   ├── reporters/
+│   │   ├── jira.reporter.ts         # Auto-create Jira bug tickets on failure
+│   │   └── n8n.reporter.ts          # Dispatch suite results to n8n webhook
+│   └── utils/
+│       ├── jira.client.ts           # Jira REST API client (mock + live)
+│       └── n8n.client.ts            # n8n webhook HTTP client
 ├── tests/
-│   ├── api/                    # API smoke & regression tests
-│   │   └── users.spec.ts
-│   └── ui/                     # UI E2E tests
-│       └── login.spec.ts
-├── .env                        # Environment secrets & base URLs
-├── .env.example
-├── playwright.config.ts        # Test runner & multi-project configuration
-├── tsconfig.json               # TypeScript compiler config & path aliases
+│   ├── auth.setup.ts                # One-time login, saves storageState
+│   ├── api/
+│   │   └── users.spec.ts            # API smoke tests (GET, POST, DELETE)
+│   └── ui/
+│       ├── login.spec.ts            # Login smoke (valid + invalid)
+│       ├── inventory.spec.ts        # Cart add/remove regression
+│       ├── data-driven-login.spec.ts # CSV-driven multi-user login matrix
+│       ├── visual-regression.spec.ts # Pixel-by-pixel screenshot comparison
+│       ├── jira-integration.spec.ts  # Jira ticket creation showcase
+│       ├── checkout-e2e.spec.ts      # Full checkout flow + pricing [Wave 1]
+│       ├── sorting.spec.ts           # Catalog sort verification [Wave 2]
+│       ├── responsive-mobile.spec.ts # Mobile viewport + hamburger menu [Wave 3]
+│       ├── multi-tab-links.spec.ts   # External links in new tabs [Wave 3]
+│       ├── network-resilience.spec.ts # Network mocking + fault injection [Wave 4]
+│       └── accessibility.spec.ts     # WCAG 2.1 AA compliance scan [Wave 5]
+├── test_data/
+│   └── users.csv                    # Data-driven test input matrix
+├── scripts/
+│   ├── daily-smoke-test.ps1         # Daily automation (start n8n, run, shutdown)
+│   └── register-daily-smoke-task.ps1 # One-time Windows Task Scheduler setup
+├── docker-compose.yml               # n8n container configuration
+├── playwright.config.ts             # Multi-project test runner config
+├── .env                             # Environment variables (secrets, URLs)
+├── .env.example                     # Template for .env setup
+├── TEST_EXPANSION_PLAN.md           # Detailed wave-by-wave expansion checklist
+├── PROJECT_PREFERENCES.md           # Team coding standards and conventions
+├── AGENTS.md                        # AI agent behavioral rules
 └── package.json
 ```
 
-## 🚀 Getting Started
+> Items marked `[Wave N]` are part of the test expansion roadmap. See [TEST_EXPANSION_PLAN.md](TEST_EXPANSION_PLAN.md) for status.
 
-### 1. Install Dependencies
+---
+
+## Prerequisites
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Node.js | >= 20 | JavaScript runtime |
+| pnpm | >= 9 | Package manager |
+| Docker Desktop | Latest | n8n container hosting |
+| Git | Latest | Version control |
+
+---
+
+## Getting Started
+
+### 1. Clone and Install
+
 ```bash
+git clone <repository-url>
+cd testing-automation
 pnpm install
 pnpm exec playwright install chromium
 ```
 
-*(Fallback with npm: `npm install && npx playwright install chromium`)*
+### 2. Configure Environment
 
-### 2. Run Tests
+Copy the example file and update values:
 
-* **Run all tests (UI + API):**
-  ```bash
-  pnpm test
-  ```
+```bash
+cp .env.example .env
+```
 
-* **Run only API tests:**
-  ```bash
-  pnpm run test:api
-  ```
+Key variables in `.env`:
 
-* **Run only UI tests:**
-  ```bash
-  pnpm run test:ui
-  ```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BASE_UI_URL` | `https://www.saucedemo.com` | Target web application |
+| `BASE_API_URL` | `https://reqres.in/api/` | Target REST API |
+| `N8N_WEBHOOK_URL` | `http://localhost:5678/webhook/test-events` | n8n production webhook |
+| `ENABLE_AUTO_JIRA_BUG` | `false` | Toggle Jira auto-ticket creation |
 
-* **Run UI tests in headed browser (watch tests execute):**
-  ```bash
-  pnpm run test:headed
-  ```
+---
 
-* **View HTML Test Report:**
-  ```bash
-  pnpm run test:report
-  ```
+## Running Tests
 
-### 3. Run n8n Workflow Automation (Docker)
+### Quick Commands
 
-* **Start n8n in background:**
-  ```bash
-  docker compose up -d
-  ```
+| Command | What It Runs |
+|---------|-------------|
+| `pnpm test` | All tests (API + UI) |
+| `pnpm run test:ui` | UI tests only (Chromium) |
+| `pnpm run test:api` | API tests only |
+| `pnpm run test:headed` | UI tests with visible browser |
+| `pnpm run test:visual` | Visual regression screenshots |
+| `pnpm run test:report` | Open HTML report in browser |
+| `pnpm run clean` | Delete test artifacts |
 
-* **Open n8n Web UI in browser:**
-  👉 **[http://localhost:5678](http://localhost:5678)**
+### Run a Specific Test File
 
-* **Production Webhook URL used by Playwright:**
-  `http://localhost:5678/webhook/test-events`
+```bash
+pnpm exec playwright test tests/ui/checkout-e2e.spec.ts
+```
 
-* **Check status & logs:**
-  ```bash
-  docker ps
-  docker logs -f n8n-automation
-  ```
+### Run Tests with Tag Filtering
 
-* **Stop n8n:**
-  ```bash
-  docker compose down
-  ```
+```bash
+pnpm exec playwright test --grep "smoke"
+pnpm exec playwright test --grep "checkout"
+```
 
-*(Fallback without Docker: `pnpm dlx n8n` or `npx n8n`)*
+### Update Visual Regression Baselines
 
-## 🧩 Advanced Features & QAOps Integrations
+```bash
+pnpm exec playwright test tests/ui/visual-regression.spec.ts --update-snapshots
+```
 
-* **Data-Driven Testing (CSV):** `tests/ui/data-driven-login.spec.ts` dynamically parses `test_data/users.csv`.
-* **Visual Regression Testing:** `tests/ui/visual-regression.spec.ts` pixel comparison against golden baselines (`--update-snapshots`).
-* **Jira Defect Logging:** Custom `jira.reporter.ts` automatically logs bug tickets on final retry.
-* **Slack Real-Time Notifications:** n8n routes passing suites (green checkmark) and failing suites (urgent `<!here>` alert).
-* **Google Sheets Live Dashboard:** Auto-appends formatted execution rows, pass rates, and donut chart updates via Apps Script.
+---
+
+## Test Coverage Matrix
+
+### Target Application: [SauceDemo](https://www.saucedemo.com/)
+
+| Page / Feature | Test File | Wave | Status |
+|---------------|-----------|------|--------|
+| Login (valid + invalid) | `login.spec.ts` | Foundation | DONE |
+| Login (CSV multi-user matrix) | `data-driven-login.spec.ts` | Foundation | DONE |
+| Login (visual regression) | `visual-regression.spec.ts` | Foundation | DONE |
+| Inventory (add/remove cart) | `inventory.spec.ts` | Foundation | DONE |
+| Jira ticket on failure | `jira-integration.spec.ts` | Foundation | DONE |
+| Full checkout flow + pricing | `checkout-e2e.spec.ts` | Wave 1 | DONE |
+| Catalog sorting verification | `sorting.spec.ts` | Wave 2 | DONE |
+| Mobile responsive + hamburger | `responsive-mobile.spec.ts` | Wave 3 | DONE |
+| External links (new tab) | `multi-tab-links.spec.ts` | Wave 3 | DONE |
+| Network mocking + fault injection | `network-resilience.spec.ts` | Wave 4 | DONE |
+| Accessibility (WCAG 2.1 AA) | `accessibility.spec.ts` | Wave 5 | DONE |
+
+### Target API: [ReqRes.in](https://reqres.in/)
+
+| Endpoint | Method | Test File | Status |
+|----------|--------|-----------|--------|
+| `/api/users` | GET | `users.spec.ts` | DONE |
+| `/api/users` | POST | `users.spec.ts` | DONE |
+| `/api/users/2` | GET | `users.spec.ts` | DONE |
+| `/api/users/2` | DELETE | `users.spec.ts` | DONE |
+
+### SauceDemo User Coverage
+
+| Username | Behavior | Tested In |
+|----------|----------|-----------|
+| `standard_user` | Normal baseline | All test files |
+| `locked_out_user` | Login blocked | `data-driven-login.spec.ts` |
+| `problem_user` | Broken product images | Wave 3 (planned) |
+| `performance_glitch_user` | Slow page loads (3-5s) | Wave 4 (planned) |
+| `error_user` | Server errors on forms | Wave 1 (planned) |
+| `visual_user` | Layout shifts | Wave 3 (planned) |
+
+---
+
+## QAOps Pipeline
+
+Test results flow through an automated pipeline after every run:
+
+```text
+Playwright Test Run
+       |
+       v
+[n8n Reporter] -- POST --> n8n Webhook (Docker)
+       |                         |
+       |                         ├── Google Sheets (append row + update metrics)
+       |                         |
+       |                         └── IF Node
+       |                              ├── PASSED -> Slack (summary)
+       |                              └── FAILED -> Slack (<!here> alert + details)
+       |
+[Jira Reporter] -- Mock/Live --> Jira Cloud (auto-create Bug ticket)
+```
+
+### Start the QAOps Pipeline
+
+```bash
+# Start n8n orchestration engine
+docker compose up -d
+
+# Open n8n workflow editor
+# http://localhost:5678
+
+# Run tests (results auto-dispatched to Slack + Google Sheets)
+pnpm test
+```
+
+### Stop the Pipeline
+
+```bash
+docker compose down
+```
+
+---
+
+## Daily Automated Smoke Test
+
+A Windows Task Scheduler job runs the API smoke monitor every morning:
+
+| Setting | Value |
+|---------|-------|
+| Task Name | `QA Daily Smoke Test` |
+| Schedule | Daily at 8:55 AM (UTC+7 Vietnam) |
+| Workflow | `Daily 9AM Smoke Monitor` (n8n cron `0 9 * * *`) |
+| Auto-Shutdown | Container stops at ~9:02 AM after completion |
+| Logs | `logs/daily-smoke-YYYY-MM-DD.log` |
+
+### One-Time Setup (Run as Administrator)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "E:\Documents\Testing Automation\scripts\register-daily-smoke-task.ps1"
+```
+
+### Manage the Scheduled Task
+
+```powershell
+# View task status
+Get-ScheduledTask -TaskName "QA Daily Smoke Test"
+
+# Run manually
+Start-ScheduledTask -TaskName "QA Daily Smoke Test"
+
+# Remove task
+Unregister-ScheduledTask -TaskName "QA Daily Smoke Test"
+```
+
+---
+
+## Test Expansion Roadmap
+
+See [TEST_EXPANSION_PLAN.md](TEST_EXPANSION_PLAN.md) for the full checklist with detailed breakdowns.
+
+| Wave | Focus Area | New Tests | Status |
+|------|-----------|-----------|--------|
+| Wave 1 | E2E Checkout Flow + Business Logic | 6 scenarios | DONE |
+| Wave 2 | Catalog Sorting Verification | 6 scenarios | DONE |
+| Wave 3 | Mobile Responsive + Multi-Tab Links | 7 scenarios | DONE |
+| Wave 4 | Network Interception + Fault Injection | 6 scenarios | DONE |
+| Wave 5 | Accessibility (WCAG 2.1 AA) | 6 scenarios | DONE |
+
+---
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `pnpm: command not found` | Install: `npm install -g pnpm` |
+| Playwright browsers not installed | Run: `pnpm exec playwright install chromium` |
+| n8n container won't start | Check Docker Desktop is running: `docker ps` |
+| Slack notifications not arriving | Verify webhook URL in n8n workflow matches `.env` |
+| Tests fail with `storageState` error | Delete `playwright/.auth/` and re-run: `pnpm test` |
+| Visual regression fails after intentional UI change | Update baselines: `--update-snapshots` |
+| Google Sheets not updating | Check Apps Script webhook URL and execution permissions |

@@ -37,7 +37,7 @@ export class JiraClient {
    */
   async createBug(payload: JiraBugPayload): Promise<JiraIssueResponse | null> {
     if (!this.isEnabled) {
-      console.log('ℹ️ Jira auto-ticket logging is disabled in .env (ENABLE_AUTO_JIRA_BUG=false)');
+      console.log('[Jira] Auto-ticket logging is disabled in .env (ENABLE_AUTO_JIRA_BUG=false)');
       return null;
     }
 
@@ -66,9 +66,9 @@ export class JiraClient {
             {
               type: 'paragraph',
               content: [
-                { type: 'text', text: `📁 Test File: ${payload.testFile}\n` },
-                { type: 'text', text: `🧪 Scenario: ${payload.scenarioName}\n` },
-                { type: 'text', text: `⏱ Timestamp: ${new Date().toISOString()}\n` },
+                { type: 'text', text: `Test File: ${payload.testFile}\n` },
+                { type: 'text', text: `Scenario: ${payload.scenarioName}\n` },
+                { type: 'text', text: `Timestamp: ${new Date().toISOString()}\n` },
               ],
             },
             {
@@ -104,7 +104,7 @@ export class JiraClient {
       };
 
       this.saveLocalTicketRecord(mockKey, issueBody);
-      console.log(`\n🎫 [Jira Mock] Created Bug Ticket: ${mockKey} -> "${payload.scenarioName}"`);
+      console.log(`\n[Jira Mock] Created Bug Ticket: ${mockKey} -> "${payload.scenarioName}"`);
       return mockResponse;
     }
 
@@ -123,15 +123,15 @@ export class JiraClient {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`❌ Failed to create Jira ticket: ${response.status} - ${errorText}`);
+        console.error(`[ERROR] Failed to create Jira ticket: ${response.status} - ${errorText}`);
         return null;
       }
 
       const created = (await response.json()) as JiraIssueResponse;
-      console.log(`\n🎫 [Jira Live] Successfully created ticket: ${created.key} at ${this.host}/browse/${created.key}`);
+      console.log(`\n[Jira Live] Successfully created ticket: ${created.key} at ${this.host}/browse/${created.key}`);
       return created;
     } catch (err) {
-      console.error('❌ Exception occurred while calling Jira API:', err);
+      console.error('[ERROR] Exception occurred while calling Jira API:', err);
       return null;
     }
   }
